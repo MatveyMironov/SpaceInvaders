@@ -18,13 +18,13 @@ public class Gun
         }
     }
 
-    public void Shoot(Projectile projectilePrefab, Transform muzzle, float projectileSpeed)
+    public void Shoot(Projectile projectilePrefab, Transform muzzle, float projectileSpeed, MovementField movementField)
     {
         if (_isRecharging)
             return;
 
         Projectile projectile = UnityEngine.GameObject.Instantiate(projectilePrefab, muzzle.position, muzzle.rotation);
-        projectile.SetSpeed(projectileSpeed);
+        projectile.ProgramProjectile(projectileSpeed, movementField);
         _isRecharging = true;
     }
 }

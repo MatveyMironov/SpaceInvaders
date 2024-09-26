@@ -3,10 +3,15 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     private float _movementSpeed;
+    private MovementField _movementField;
 
     private void Update()
     {
         transform.position += transform.up * _movementSpeed * Time.deltaTime;
+        if (!_movementField.CheckIfInsideField(transform.position))
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -18,8 +23,9 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void SetSpeed(float projectileSpeed)
+    public void ProgramProjectile(float projectileSpeed, MovementField movementField)
     {
         _movementSpeed = projectileSpeed;
+        _movementField = movementField;
     }
 }

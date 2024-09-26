@@ -34,7 +34,7 @@ public class Player : MonoBehaviour
 
     private void Shoot()
     {
-        _playerGun.Shoot(projectilePrefab, muzzle, projectileSpeed);
+        _playerGun.Shoot(projectilePrefab, muzzle, projectileSpeed, movementField);
     }
 
     private void OnEnable()
