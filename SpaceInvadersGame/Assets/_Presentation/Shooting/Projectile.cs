@@ -2,10 +2,15 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    public float MovementSpeed;
+    private float _movementSpeed;
 
-    void Update()
+    private void Update()
     {
-        transform.position += transform.up * MovementSpeed * Time.deltaTime;
+        transform.position += transform.up * _movementSpeed * Time.deltaTime;
+    }
+
+    public void SetSpeed(float projectileSpeed)
+    {
+        _movementSpeed = projectileSpeed;
     }
 }
