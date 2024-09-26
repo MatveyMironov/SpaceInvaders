@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    public float MovementSpeed;
+    private float _movementSpeed;
 
-    void Update()
+    private void Update()
     {
-        transform.position += transform.up * MovementSpeed * Time.deltaTime;
+        transform.position += transform.up * _movementSpeed * Time.deltaTime;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -16,5 +16,10 @@ public class Projectile : MonoBehaviour
             destroyable.Destroy();
         }
         Destroy(gameObject);
+    }
+
+    public void SetSpeed(float projectileSpeed)
+    {
+        _movementSpeed = projectileSpeed;
     }
 }
