@@ -2,7 +2,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [Header("Movement")]
     [SerializeField] private float movementSpeed;
+    [SerializeField] private MovementField movementField;
 
     [Header("Shooting")]
     [SerializeField] private Projectile projectilePrefab;
@@ -18,7 +20,7 @@ public class Player : MonoBehaviour
     {
         if (_movementDirection != 0)
         {
-            _playerMovement.MovePlayer(transform, Mathf.RoundToInt(_movementDirection), movementSpeed);
+            _playerMovement.MovePlayer(transform, Mathf.RoundToInt(_movementDirection), movementSpeed, movementField);
         }
     }
 
