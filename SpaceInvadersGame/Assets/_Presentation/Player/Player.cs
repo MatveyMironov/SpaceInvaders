@@ -12,24 +12,24 @@ public class Player : MonoBehaviour
     [SerializeField] private float projectileSpeed;
     [SerializeField] private Transform muzzle;
 
-    private PlayerMovement _playerMovement = new();
+    private Movement _playerMovement = new();
     private Gun _playerGun = new();
 
-    private float _movementDirection = 0;
+    private Vector2 _movementDirection = Vector2.zero;
 
     private void Update()
     {
         _playerGun.FunctioningTick(rechargingTime);
 
-        if (_movementDirection != 0)
+        if (_movementDirection != Vector2.zero)
         {
-            _playerMovement.MovePlayer(transform, Mathf.RoundToInt(_movementDirection), movementSpeed, movementField);
+            _playerMovement.MoveObject(transform, _movementDirection, movementSpeed, movementField);
         }
     }
 
     private void SetNewMovementDirection(float direction)
     {
-        _movementDirection = direction;
+        _movementDirection.x = direction;
     }
 
     private void Shoot()
