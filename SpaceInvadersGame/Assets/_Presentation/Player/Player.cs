@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     {
         if (_movementDirection != 0)
         {
-            _playerMovement.MovePlayer(transform, _movementDirection, movementSpeed);
+            _playerMovement.MovePlayer(transform, Mathf.RoundToInt(_movementDirection), movementSpeed);
         }
     }
 
