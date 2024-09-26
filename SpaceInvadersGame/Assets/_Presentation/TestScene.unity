@@ -432,7 +432,8 @@ MonoBehaviour:
   movementSpeed: 10
   movementField: {fileID: 707045677}
   projectilePrefab: {fileID: 8842510836430377940, guid: 1a5c0a193ccfbdd499257232172e2b0d, type: 3}
-  projectileSpeed: 5
+  rechargingTime: 1
+  projectileSpeed: 10
   muzzle: {fileID: 786693825}
 --- !u!212 &1522243543
 SpriteRenderer:

@@ -8,16 +8,19 @@ public class Player : MonoBehaviour
 
     [Header("Shooting")]
     [SerializeField] private Projectile projectilePrefab;
+    [SerializeField] private float rechargingTime;
     [SerializeField] private float projectileSpeed;
     [SerializeField] private Transform muzzle;
 
     private PlayerMovement _playerMovement = new();
-    private Gun _playerShooting = new();
+    private Gun _playerGun = new();
 
     private float _movementDirection = 0;
 
     private void Update()
     {
+        _playerGun.FunctioningTick(rechargingTime);
+
         if (_movementDirection != 0)
         {
             _playerMovement.MovePlayer(transform, Mathf.RoundToInt(_movementDirection), movementSpeed, movementField);
@@ -31,7 +34,7 @@ public class Player : MonoBehaviour
 
     private void Shoot()
     {
-        _playerShooting.Shoot(projectilePrefab, muzzle, projectileSpeed);
+        _playerGun.Shoot(projectilePrefab, muzzle, projectileSpeed);
     }
 
     private void OnEnable()
