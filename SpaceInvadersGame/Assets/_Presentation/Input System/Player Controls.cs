@@ -35,6 +35,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Shoot"",
+                    ""type"": ""Button"",
+                    ""id"": ""e8437511-ebe7-4e4a-95d1-33c61dd70ae0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -70,6 +79,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a117f604-680e-4b79-bf03-00d9da7418e8"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -79,6 +99,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         // Main Action Map
         m_MainActionMap = asset.FindActionMap("Main Action Map", throwIfNotFound: true);
         m_MainActionMap_Move = m_MainActionMap.FindAction("Move", throwIfNotFound: true);
+        m_MainActionMap_Shoot = m_MainActionMap.FindAction("Shoot", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -141,11 +162,13 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_MainActionMap;
     private List<IMainActionMapActions> m_MainActionMapActionsCallbackInterfaces = new List<IMainActionMapActions>();
     private readonly InputAction m_MainActionMap_Move;
+    private readonly InputAction m_MainActionMap_Shoot;
     public struct MainActionMapActions
     {
         private @PlayerControls m_Wrapper;
         public MainActionMapActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_MainActionMap_Move;
+        public InputAction @Shoot => m_Wrapper.m_MainActionMap_Shoot;
         public InputActionMap Get() { return m_Wrapper.m_MainActionMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -158,6 +181,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
+            @Shoot.started += instance.OnShoot;
+            @Shoot.performed += instance.OnShoot;
+            @Shoot.canceled += instance.OnShoot;
         }
 
         private void UnregisterCallbacks(IMainActionMapActions instance)
@@ -165,6 +191,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
             @Move.canceled -= instance.OnMove;
+            @Shoot.started -= instance.OnShoot;
+            @Shoot.performed -= instance.OnShoot;
+            @Shoot.canceled -= instance.OnShoot;
         }
 
         public void RemoveCallbacks(IMainActionMapActions instance)
@@ -185,5 +214,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     public interface IMainActionMapActions
     {
         void OnMove(InputAction.CallbackContext context);
+        void OnShoot(InputAction.CallbackContext context);
     }
 }
