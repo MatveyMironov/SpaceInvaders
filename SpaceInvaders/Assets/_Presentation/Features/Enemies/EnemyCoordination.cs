@@ -1,39 +1,104 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyCoordination : MonoBehaviour
 {
-    [SerializeField] private EnemyGrid enemyGrid;
     [SerializeField] private MovementField movementField;
+    [SerializeField] private EnemySpawner spawner;
+
+    private EnemyRectangularPack _enemyPack;
+
+    private MovementDirection _previousDirection;
+    private MovementDirection _currentDirection;
+
+    private enum MovementDirection
+    {
+        up,
+        down,
+        left,
+        right,
+    }
 
     private void Start()
     {
-        StartMoving();
+        List<Enemy> enemies = spawner.SpawnEnemies();
+        _enemyPack = new EnemyRectangularPack(enemies);
+
+        Vector3 movingLeft = new Vector3(movementField.LeftBorder - _enemyPack.Leftest, 0, 0);
+        StartMovingTo(movingLeft);
+        _previousDirection = MovementDirection.left;
+        _currentDirection = MovementDirection.left;
     }
 
     private void Update()
     {
-        
-    }
-
-    private void StartMoving()
-    {
-        for (int i = 0; i < enemyGrid.RowsCount; i++)
+        if (CheckIfAllReachedPosition())
         {
-            for (int j = 0; j < enemyGrid.ColumnsCount; j++)
+            if (CheckIfAnyReachedLowerBorder())
             {
-                Vector2Int gridPosition = new Vector2Int(j, i);
-                if (enemyGrid.Enemies.ContainsKey(gridPosition))
+                Debug.Log("Reached Lower Border");
+                return;
+            }
+
+            Vector3 movementTarget = Vector3.zero;
+
+            if (_currentDirection == MovementDirection.left || _currentDirection == MovementDirection.right)
+            {
+                movementTarget = new Vector3(0, -1, 0);
+                ChangeMovementDirection(MovementDirection.down);
+            }
+            else if (_currentDirection == MovementDirection.down)
+            {
+                if (_previousDirection == MovementDirection.left)
                 {
-                    Enemy enemy = enemyGrid.Enemies[gridPosition];
-                    if (enemy != null)
-                    {
-                        Vector2 movementTarget = new Vector2(movementField.LeftBorder + j, enemy.transform.position.y);
-                        enemy.Movement.SetMovementTarget(movementTarget);
-                    }
+                    movementTarget = new Vector3(movementField.RightBorder - _enemyPack.Rightest, 0, 0);
+                    ChangeMovementDirection(MovementDirection.right);
+                }
+                else if (_previousDirection == MovementDirection.right)
+                {
+                    movementTarget = new Vector3(movementField.LeftBorder + _enemyPack.Leftest, 0, 0);
+                    ChangeMovementDirection(MovementDirection.left);
                 }
             }
+
+            StartMovingTo(movementTarget);
         }
+    }
+
+    private void ChangeMovementDirection(MovementDirection direction)
+    {
+
+        _previousDirection = _currentDirection;
+        _currentDirection = direction;
+    }
+
+    private void StartMovingTo(Vector3 position)
+    {
+        foreach (var enemyPlace in _enemyPack.EnemyPlaces)
+        {
+            if (enemyPlace != null)
+            {
+                Vector3 movementTarget = enemyPlace.RelativePosition + position;
+
+                enemyPlace.Enemy.Movement.SetMovementTarget(movementTarget);
+            }
+        }
+    }
+
+    private bool CheckIfAllReachedPosition()
+    {
+        bool allHaveReached = true;
+
+        foreach (var enemyPlace in _enemyPack.EnemyPlaces)
+        {
+            allHaveReached &= enemyPlace.Enemy.Movement.HasReachedTarget;
+        }
+
+        return allHaveReached;
+    }
+
+    private bool CheckIfAnyReachedLowerBorder()
+    {
+        return _enemyPack.GetLowest() <= movementField.LowerBorder;
     }
 }

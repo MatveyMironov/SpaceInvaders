@@ -1,25 +1,34 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+    [SerializeField] private List<Transform> spawnPoints = new();
+
+    [Space]
     [SerializeField] private Enemy enemyPrefab;
-    [SerializeField] private List<Vector2Int> gridPositions = new();
-    [SerializeField] private Transform UpperRightCorner;
-    [SerializeField] private float horizontalDistance;
-    [SerializeField] private float verticalDistance;
+
+    [ContextMenu("Spawn Enemies")]
+    public List<Enemy> SpawnEnemies()
+    {
+        List<Enemy> spawnedEnemies = new();
+
+        foreach (var spawnPoint in spawnPoints)
+        {
+            Enemy enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
+            spawnedEnemies.Add(enemy);
+        }
+
+        return spawnedEnemies;
+    }
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = new Color(1.0f, 0, 0, 0.5f);
 
-        foreach (var gridPosition in gridPositions)
+        foreach (var spawnPoint in spawnPoints)
         {
-            Vector3 worldPosition = new Vector3(UpperRightCorner.position.x - (gridPosition.x * horizontalDistance), 
-                UpperRightCorner.position.y - (gridPosition.y * verticalDistance), 0);
-
-            Gizmos.DrawSphere(worldPosition, 0.5f);
+            Gizmos.DrawSphere(spawnPoint.position, 0.5f);
         }
     }
 }

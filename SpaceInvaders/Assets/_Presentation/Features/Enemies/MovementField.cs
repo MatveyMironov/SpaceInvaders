@@ -18,4 +18,13 @@ public class MovementField : MonoBehaviour
             && position.x > LeftBorder
             && position.x < RightBorder);
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+
+        Vector3 center = new Vector3((RightBorder + LeftBorder) / 2, (UpperBorder + LowerBorder) / 2, 0);
+        Vector3 size = new Vector3(RightBorder - LeftBorder, UpperBorder - LowerBorder, 0);
+        Gizmos.DrawWireCube(center, size);
+    }
 }
