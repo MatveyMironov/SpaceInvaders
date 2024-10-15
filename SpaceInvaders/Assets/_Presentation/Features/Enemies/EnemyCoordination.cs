@@ -8,12 +8,13 @@ public class EnemyCoordination : MonoBehaviour
 
     private EnemyRectangularPack _enemyPack;
 
+    private float _currentHeight = 0;
+
     private MovementDirection _previousDirection;
     private MovementDirection _currentDirection;
 
     private enum MovementDirection
     {
-        up,
         down,
         left,
         right,
@@ -42,21 +43,28 @@ public class EnemyCoordination : MonoBehaviour
 
             Vector3 movementTarget = Vector3.zero;
 
-            if (_currentDirection == MovementDirection.left || _currentDirection == MovementDirection.right)
+            if (_currentDirection == MovementDirection.left)
             {
-                movementTarget = new Vector3(0, -1, 0);
+                _currentHeight--;
+                movementTarget = new Vector3(movementField.LeftBorder - _enemyPack.Leftest, _currentHeight, 0);
+                ChangeMovementDirection(MovementDirection.down);
+            }
+            else if (_currentDirection == MovementDirection.right)
+            {
+                _currentHeight--;
+                movementTarget = new Vector3(movementField.RightBorder - _enemyPack.Rightest, _currentHeight, 0);
                 ChangeMovementDirection(MovementDirection.down);
             }
             else if (_currentDirection == MovementDirection.down)
             {
                 if (_previousDirection == MovementDirection.left)
                 {
-                    movementTarget = new Vector3(movementField.RightBorder - _enemyPack.Rightest, 0, 0);
+                    movementTarget = new Vector3(movementField.RightBorder - _enemyPack.Rightest, _currentHeight, 0);
                     ChangeMovementDirection(MovementDirection.right);
                 }
                 else if (_previousDirection == MovementDirection.right)
                 {
-                    movementTarget = new Vector3(movementField.LeftBorder + _enemyPack.Leftest, 0, 0);
+                    movementTarget = new Vector3(movementField.LeftBorder - _enemyPack.Leftest, _currentHeight, 0);
                     ChangeMovementDirection(MovementDirection.left);
                 }
             }

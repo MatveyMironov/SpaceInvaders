@@ -7,6 +7,8 @@ public class EnemyRectangularPack
 
     public EnemyRectangularPack(List<Enemy> enemies)
     {
+        _enemiePlaces = new();
+
         foreach (Enemy enemy in enemies)
         {
             EnemyPlace enemyPlace = new(enemy, enemy.transform.position);
