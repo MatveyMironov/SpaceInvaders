@@ -2282,7 +2282,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectilePrefab: {fileID: 461784749269899803, guid: e3a29b41fdfe8c24fa7e5d1c890e3c10, type: 3}
   muzzle: {fileID: 659832233}
-  projectileSpeed: 20
+  projectileSpeed: 25
   hitableLayers:
     serializedVersion: 2
     m_Bits: 4294967295
