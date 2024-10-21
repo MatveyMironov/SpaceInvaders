@@ -12,11 +12,14 @@ public class EnemyMovement
     private Vector3 _targetPosition;
     private bool _needsToMove;
 
-    public bool HasReachedTarget { get { return enemyTransform.position == _targetPosition; } }
+    public bool CheckIfHasReachedTarget()
+    {
+        return enemyTransform.position == _targetPosition;
+    }
 
     public void MovementTick()
     {
-        if (_needsToMove && !HasReachedTarget)
+        if (_needsToMove && !CheckIfHasReachedTarget())
         {
             enemyTransform.position = Vector3.MoveTowards(enemyTransform.position, _targetPosition, movementSpeed * Time.deltaTime);
         }

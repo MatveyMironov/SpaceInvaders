@@ -131,4 +131,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movement:
     enemyTransform: {fileID: 6870718356415032728}
-    movementSpeed: 10
+    movementSpeed: 5

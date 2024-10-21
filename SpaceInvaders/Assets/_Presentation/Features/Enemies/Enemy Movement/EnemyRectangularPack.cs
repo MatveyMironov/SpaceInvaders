@@ -49,9 +49,12 @@ public class EnemyRectangularPack
 
         foreach (var enemyPlace in _enemiePlaces)
         {
-            if (enemyPlace.Enemy.transform.position.y < lowest)
+            if (enemyPlace.Enemy != null)
             {
-                lowest = enemyPlace.Enemy.transform.position.y;
+                if (enemyPlace.Enemy.transform.position.y < lowest)
+                {
+                    lowest = enemyPlace.Enemy.transform.position.y;
+                }
             }
         }
 
