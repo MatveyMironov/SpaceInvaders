@@ -19,6 +19,29 @@ public class MovementField : MonoBehaviour
             && position.x < RightBorder);
     }
 
+    public Vector3 ClampPositionToField(Vector3 position)
+    {
+        if (position.y > UpperBorder)
+        {
+            position.y = UpperBorder;
+        }
+        else if (position.y < LowerBorder)
+        {
+            position.y = LowerBorder;
+        }
+        
+        if (position.x > RightBorder)
+        {
+            position.x = RightBorder;
+        }
+        else if (position.x < LeftBorder)
+        {
+            position.x = LeftBorder;
+        }
+
+        return position;
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
