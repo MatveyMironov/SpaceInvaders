@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IHitable
 {
     [SerializeField] private EnemyMovement movement;
 
@@ -10,4 +10,10 @@ public class Enemy : MonoBehaviour
     {
         movement.MovementTick();
     }
+
+    public void Hit()
+    {
+        Destroy(gameObject);
+    }
+
 }

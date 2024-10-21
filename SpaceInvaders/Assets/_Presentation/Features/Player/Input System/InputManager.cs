@@ -3,6 +3,7 @@ using UnityEngine;
 public class InputManager : MonoBehaviour
 {
     [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private PlayerShooting playerShooting;
 
     public void InvokeMovement(float moveInput)
     {
@@ -18,5 +19,10 @@ public class InputManager : MonoBehaviour
         }
 
         playerMovement.ChangeMovementDirection(direction);
+    }
+
+    public void InvokeShoot()
+    {
+        playerShooting.Shoot();
     }
 }

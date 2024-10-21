@@ -14,6 +14,8 @@ public class InputListener : MonoBehaviour
         _playerControls.MainActionMap.Move.started += OnMove;
         _playerControls.MainActionMap.Move.performed += OnMove;
         _playerControls.MainActionMap.Move.canceled += OnMove;
+
+        _playerControls.MainActionMap.Fire.performed += OnFire;
     }
 
     private void OnEnable()
@@ -30,5 +32,10 @@ public class InputListener : MonoBehaviour
     {
         float moveInput = context.ReadValue<float>();
         inputManager.InvokeMovement(moveInput);
+    }
+
+    private void OnFire(InputAction.CallbackContext context)
+    {
+        inputManager.InvokeShoot();
     }
 }
