@@ -99,7 +99,10 @@ public class EnemyCoordination : MonoBehaviour
 
         foreach (var enemyPlace in _enemyPack.EnemyPlaces)
         {
-            allHaveReached &= enemyPlace.Enemy.Movement.HasReachedTarget;
+            if (enemyPlace.Enemy != null)
+            {
+                allHaveReached &= enemyPlace.Enemy.Movement.CheckIfHasReachedTarget();
+            }
         }
 
         return allHaveReached;
