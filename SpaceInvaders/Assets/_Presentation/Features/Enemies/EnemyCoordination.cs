@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,7 +20,9 @@ public class EnemyCoordination : MonoBehaviour
     private MovementDirection _previousDirection;
     private MovementDirection _currentDirection;
 
-    Vector3 _movementTarget = Vector3.zero;
+    private Vector3 _movementTarget = Vector3.zero;
+
+    public event Action OnLowerBorderReached;
 
     private enum MovementDirection
     {
@@ -48,7 +51,7 @@ public class EnemyCoordination : MonoBehaviour
         {
             if (CheckIfAnyReachedLowerBorder())
             {
-                Debug.Log("Reached Lower Border");
+                OnLowerBorderReached?.Invoke();
                 return;
             }
 
@@ -143,7 +146,7 @@ public class EnemyCoordination : MonoBehaviour
             {
                 if (salvoCandidates.Count <= 0) { break; }
 
-                int index = Random.Range(0, salvoCandidates.Count - 1);
+                int index = UnityEngine.Random.Range(0, salvoCandidates.Count - 1);
                 salvoMembers.Add(salvoCandidates[index]);
                 salvoCandidates.RemoveAt(index);
             }
