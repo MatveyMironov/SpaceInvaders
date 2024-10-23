@@ -2675,7 +2675,7 @@ MonoBehaviour:
   lossWindow: {fileID: 78873268}
   winWindow: {fileID: 606865794}
   gamePause: {fileID: 1220263005}
-  inputManager: {fileID: 0}
+  inputManager: {fileID: 1966558974}
 --- !u!1 &1458990097
 GameObject:
   m_ObjectHideFlags: 0
