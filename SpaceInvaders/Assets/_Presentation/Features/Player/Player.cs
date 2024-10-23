@@ -1,18 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IHitable
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Health health;
 
-    // Update is called once per frame
-    void Update()
+    public void Hit()
     {
-        
+        health.RemoveHealth(1);
     }
 }

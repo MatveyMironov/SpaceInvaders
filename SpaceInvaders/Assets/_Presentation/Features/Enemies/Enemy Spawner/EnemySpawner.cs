@@ -1,34 +1,51 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] private List<Transform> spawnPoints = new();
-
-    [Space]
-    [SerializeField] private Enemy enemyPrefab;
+    [SerializeField] private SpawnerProgram spawnerProgram;
+    [SerializeField] private Transform spawnOrigin;
 
     [ContextMenu("Spawn Enemies")]
-    public List<Enemy> SpawnEnemies()
+    public EnemyPack SpawnEnemies()
     {
-        List<Enemy> spawnedEnemies = new();
+        EnemyGrid.Column[] columns = new EnemyGrid.Column[spawnerProgram.EnemyGrid.Columns.Length];
 
-        foreach (var spawnPoint in spawnPoints)
+        for (int i = 0; i < spawnerProgram.EnemyGrid.Columns.Length; i++)
         {
-            Enemy enemy = Instantiate(enemyPrefab, spawnPoint.position, Quaternion.identity);
-            spawnedEnemies.Add(enemy);
+            Enemy[] enemies = new Enemy[spawnerProgram.EnemyGrid.Columns[i].Enemies.Length];
+
+            for (int j = 0; j < spawnerProgram.EnemyGrid.Columns[i].Enemies.Length; j++)
+            {
+                Enemy enemyPrefab = spawnerProgram.EnemyGrid.Columns[i].Enemies[j];
+
+                Vector3 spawnPoint = new Vector3();
+                spawnPoint.x = spawnOrigin.position.x - (float)i * spawnerProgram.HorizontalDistance;
+                spawnPoint.y = spawnOrigin.position.y - (float)j * spawnerProgram.VerticalDistance;
+                
+                Enemy enemy = Instantiate(enemyPrefab, spawnPoint, Quaternion.identity);
+                enemies[j] = enemy;
+            }
+
+            columns[i] = new EnemyGrid.Column(enemies);
         }
 
-        return spawnedEnemies;
+        return new EnemyPack(new EnemyGrid(columns), spawnerProgram.HorizontalDistance, spawnerProgram.VerticalDistance);
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = new Color(1.0f, 0, 0, 0.5f);
 
-        foreach (var spawnPoint in spawnPoints)
+        for (int i = 0; i < spawnerProgram.EnemyGrid.Columns.Length; i++)
         {
-            Gizmos.DrawSphere(spawnPoint.position, 0.5f);
+            for (int j = 0; j < spawnerProgram.EnemyGrid.Columns[i].Enemies.Length; j++)
+            {
+                Vector3 spawnPoint = new Vector3();
+                spawnPoint.x = spawnOrigin.position.x - (float)i * spawnerProgram.HorizontalDistance;
+                spawnPoint.y = spawnOrigin.position.y - (float)j * spawnerProgram.VerticalDistance;
+
+                Gizmos.DrawSphere(spawnPoint, 0.5f);
+            }
         }
     }
 }

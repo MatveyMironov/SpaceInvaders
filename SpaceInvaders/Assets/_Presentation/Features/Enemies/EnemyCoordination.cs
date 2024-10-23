@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,12 +7,19 @@ public class EnemyCoordination : MonoBehaviour
     [SerializeField] private MovementField movementField;
     [SerializeField] private EnemySpawner spawner;
 
-    private EnemyRectangularPack _enemyPack;
+    [Header("Combat")]
+    [SerializeField] private EnemyShooter shooter;
+    [SerializeField] private float salvoCooldown;
+    [SerializeField, Range(1, 10)] private int maxSalvoMembers;
 
-    private float _currentHeight = 0;
+    private EnemyPack _enemyPack;
+
+    private float _currentHeight;
 
     private MovementDirection _previousDirection;
     private MovementDirection _currentDirection;
+
+    Vector3 _movementTarget = Vector3.zero;
 
     private enum MovementDirection
     {
@@ -22,13 +30,16 @@ public class EnemyCoordination : MonoBehaviour
 
     private void Start()
     {
-        List<Enemy> enemies = spawner.SpawnEnemies();
-        _enemyPack = new EnemyRectangularPack(enemies);
+        _enemyPack = spawner.SpawnEnemies();
 
-        Vector3 movingLeft = new Vector3(movementField.LeftBorder - _enemyPack.Leftest, 0, 0);
-        StartMovingTo(movingLeft);
+        _currentHeight = _enemyPack.EnemyGrid.Columns[0].Enemies[0].transform.position.y;
+
+        _movementTarget = new Vector3(movementField.LeftBorder + _enemyPack.Width, _currentHeight, 0);
+        StartMovingTo(_movementTarget);
         _previousDirection = MovementDirection.left;
         _currentDirection = MovementDirection.left;
+
+        StartCoroutine(ShootingCouroutine());
     }
 
     private void Update()
@@ -41,35 +52,33 @@ public class EnemyCoordination : MonoBehaviour
                 return;
             }
 
-            Vector3 movementTarget = Vector3.zero;
-
             if (_currentDirection == MovementDirection.left)
             {
                 _currentHeight--;
-                movementTarget = new Vector3(movementField.LeftBorder - _enemyPack.Leftest, _currentHeight, 0);
+                _movementTarget = new Vector3(movementField.LeftBorder + _enemyPack.Width, _currentHeight, 0);
                 ChangeMovementDirection(MovementDirection.down);
             }
             else if (_currentDirection == MovementDirection.right)
             {
                 _currentHeight--;
-                movementTarget = new Vector3(movementField.RightBorder - _enemyPack.Rightest, _currentHeight, 0);
+                _movementTarget = new Vector3(movementField.RightBorder, _currentHeight, 0);
                 ChangeMovementDirection(MovementDirection.down);
             }
             else if (_currentDirection == MovementDirection.down)
             {
                 if (_previousDirection == MovementDirection.left)
                 {
-                    movementTarget = new Vector3(movementField.RightBorder - _enemyPack.Rightest, _currentHeight, 0);
+                    _movementTarget = new Vector3(movementField.RightBorder, _currentHeight, 0);
                     ChangeMovementDirection(MovementDirection.right);
                 }
                 else if (_previousDirection == MovementDirection.right)
                 {
-                    movementTarget = new Vector3(movementField.LeftBorder - _enemyPack.Leftest, _currentHeight, 0);
+                    _movementTarget = new Vector3(movementField.LeftBorder + _enemyPack.Width, _currentHeight, 0);
                     ChangeMovementDirection(MovementDirection.left);
                 }
             }
 
-            StartMovingTo(movementTarget);
+            StartMovingTo(_movementTarget);
         }
     }
 
@@ -82,13 +91,18 @@ public class EnemyCoordination : MonoBehaviour
 
     private void StartMovingTo(Vector3 position)
     {
-        foreach (var enemyPlace in _enemyPack.EnemyPlaces)
+        for (int i = 0; i < _enemyPack.EnemyGrid.Columns.Length; i++)
         {
-            if (enemyPlace != null)
+            for (int j = 0; j < _enemyPack.EnemyGrid.Columns[i].Enemies.Length; j++)
             {
-                Vector3 movementTarget = enemyPlace.RelativePosition + position;
+                if (_enemyPack.EnemyGrid.Columns[i].Enemies[j] != null)
+                {
+                    Vector3 movementTarget = position;
+                    movementTarget.x -= i * _enemyPack.HorizontalDistance;
+                    movementTarget.y -= j * _enemyPack.VerticalDistance;
 
-                enemyPlace.Enemy.Movement.SetMovementTarget(movementTarget);
+                    _enemyPack.EnemyGrid.Columns[i].Enemies[j].Movement.SetMovementTarget(movementTarget);
+                }
             }
         }
     }
@@ -97,11 +111,14 @@ public class EnemyCoordination : MonoBehaviour
     {
         bool allHaveReached = true;
 
-        foreach (var enemyPlace in _enemyPack.EnemyPlaces)
+        foreach (var column in _enemyPack.EnemyGrid.Columns)
         {
-            if (enemyPlace.Enemy != null)
+            foreach (var enemy in column.Enemies)
             {
-                allHaveReached &= enemyPlace.Enemy.Movement.CheckIfHasReachedTarget();
+                if (enemy != null)
+                {
+                    allHaveReached &= enemy.Movement.CheckIfHasReachedTarget();
+                }
             }
         }
 
@@ -110,6 +127,36 @@ public class EnemyCoordination : MonoBehaviour
 
     private bool CheckIfAnyReachedLowerBorder()
     {
-        return _enemyPack.GetLowest() <= movementField.LowerBorder;
+        return _enemyPack.GetLowestHeight() <= movementField.LowerBorder;
+    }
+
+    private IEnumerator ShootingCouroutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(salvoCooldown);
+
+            List<Enemy> salvoCandidates = _enemyPack.GetAllLowest();
+            List<Enemy> salvoMembers = new();
+
+            for (int i = 0; i < maxSalvoMembers; i++)
+            {
+                int index = Random.Range(0, salvoCandidates.Count - 1);
+                salvoMembers.Add(salvoCandidates[index]);
+                salvoCandidates.RemoveAt(index);
+            }
+
+            foreach (var salvoMember in salvoMembers)
+            {
+                shooter.Shoot(salvoMember.Muzzle);
+            }
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(0f, 0, 1.0f, 0.5f);
+
+        Gizmos.DrawSphere(_movementTarget, 0.5f);
     }
 }

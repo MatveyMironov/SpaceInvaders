@@ -48,7 +48,7 @@ public class Projectile : MonoBehaviour
 
     private void OnHit(RaycastHit2D hit)
     {
-        if (hit.collider.TryGetComponent(out IHitable hitable))
+        if (hit.transform.TryGetComponent(out IHitable hitable))
         {
             hitable.Hit();
         }
