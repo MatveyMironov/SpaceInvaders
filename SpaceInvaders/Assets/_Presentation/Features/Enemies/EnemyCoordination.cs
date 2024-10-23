@@ -141,6 +141,8 @@ public class EnemyCoordination : MonoBehaviour
 
             for (int i = 0; i < maxSalvoMembers; i++)
             {
+                if (salvoCandidates.Count <= 0) { break; }
+
                 int index = Random.Range(0, salvoCandidates.Count - 1);
                 salvoMembers.Add(salvoCandidates[index]);
                 salvoCandidates.RemoveAt(index);
