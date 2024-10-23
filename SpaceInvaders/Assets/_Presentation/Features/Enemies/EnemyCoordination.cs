@@ -23,6 +23,7 @@ public class EnemyCoordination : MonoBehaviour
     private Vector3 _movementTarget = Vector3.zero;
 
     public event Action OnLowerBorderReached;
+    public event Action OnAllEnemiesDestroyed;
 
     private enum MovementDirection
     {

@@ -5,8 +5,12 @@ public class InputManager : MonoBehaviour
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private PlayerShooting playerShooting;
 
+    public bool IsInputEnabled { get; set; } = true;
+
     public void InvokeMovement(float moveInput)
     {
+        if (!IsInputEnabled) { return; }
+
         Vector2 direction = Vector2.zero;
 
         if (moveInput > 0)
@@ -23,6 +27,8 @@ public class InputManager : MonoBehaviour
 
     public void InvokeShoot()
     {
+        if (!IsInputEnabled) { return; }
+
         playerShooting.Shoot();
     }
 }
