@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour, IHitable
@@ -9,6 +10,8 @@ public class Enemy : MonoBehaviour, IHitable
 
     public Transform Muzzle { get => muzzle; }
 
+    public event Action OnEnemyDestoyed;
+
     private void Update()
     {
         movement.MovementTick();
@@ -16,6 +19,7 @@ public class Enemy : MonoBehaviour, IHitable
 
     public void Hit()
     {
+        OnEnemyDestoyed?.Invoke();
         Destroy(gameObject);
     }
 

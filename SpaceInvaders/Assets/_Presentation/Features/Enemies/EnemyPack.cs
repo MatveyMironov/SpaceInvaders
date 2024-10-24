@@ -1,19 +1,22 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class EnemyPack
 {
-    public EnemyPack(EnemyGrid enemyGrid, float horizontalDistance, float verticalDistance)
+    public EnemyPack(List<List<EnemyPlace>> enemies, float horizontalDistance, float verticalDistance)
     {
-        EnemyGrid = enemyGrid;
+        Enemies = enemies;
 
         HorizontalDistance = horizontalDistance;
         VerticalDistance = verticalDistance;
 
         Width = CalculateWidth();
         Height = CalculateHeight();
+
+        Subscribe();
     }
 
-    public EnemyGrid EnemyGrid { get; }
+    public List<List<EnemyPlace>> Enemies { get; }
 
     public float HorizontalDistance { get; }
     public float VerticalDistance { get; }
@@ -25,15 +28,15 @@ public class EnemyPack
     {
         float lowestHeight = float.MaxValue;
 
-        foreach (var column in EnemyGrid.Columns)
+        foreach (var column in Enemies)
         {
-            foreach (var enemy in column.Enemies)
+            foreach (var enemy in column)
             {
                 if (enemy != null)
                 {
-                    if (enemy.transform.position.y < lowestHeight)
+                    if (enemy.Enemy.transform.position.y < lowestHeight)
                     {
-                        lowestHeight = enemy.transform.position.y;
+                        lowestHeight = enemy.Enemy.transform.position.y;
                     }
                 }
             }
@@ -44,43 +47,60 @@ public class EnemyPack
 
     public List<Enemy> GetAllLowest()
     {
-        List<Enemy> enemies = new();
+        List<Enemy> lowestEnemies = new();
 
-        foreach (var column in EnemyGrid.Columns)
+        foreach (var column in Enemies)
         {
-            for (int i = column.Enemies.Length - 1; i >= 0; i--)
+            if (column.Count > 0)
             {
-                Enemy enemy = column.Enemies[i];
-
-                if (enemy != null)
-                {
-                    enemies.Add(enemy);
-
-                    break;
-                }
+                Enemy lowestEnemy = column[column.Count - 1].Enemy;
+                lowestEnemies.Add(lowestEnemy);
             }
         }
 
-        return enemies;
+        return lowestEnemies;
+    }
+
+    private void Subscribe()
+    {
+        foreach (var column in Enemies)
+        {
+            foreach (var enemy in column)
+            {
+                enemy.Enemy.OnEnemyDestoyed += () => { column.Remove(enemy); };
+            }
+        }
     }
 
     private float CalculateWidth()
     {
-        return (EnemyGrid.Columns.Length - 1) * HorizontalDistance;
+        return (Enemies.Count - 1) * HorizontalDistance;
     }
 
     private float CalculateHeight()
     {
         int maxRowsCount = 0;
 
-        foreach (var column in EnemyGrid.Columns)
+        foreach (var column in Enemies)
         {
-            if (column.Enemies.Length > maxRowsCount)
+            if (column.Count > maxRowsCount)
             {
-                maxRowsCount = column.Enemies.Length;
+                maxRowsCount = column.Count;
             }
         }
 
-        return maxRowsCount * VerticalDistance;
+        return (maxRowsCount - 1) * VerticalDistance;
+    }
+
+    public class EnemyPlace
+    {
+        public EnemyPlace(Enemy enemy, Vector3 relativePosition)
+        {
+            Enemy = enemy;
+            RelativePosition = relativePosition;
+        }
+
+        public Enemy Enemy { get; }
+        public Vector3 RelativePosition { get; }
     }
 }

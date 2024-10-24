@@ -36,7 +36,7 @@ public class EnemyCoordination : MonoBehaviour
     {
         _enemyPack = spawner.SpawnEnemies();
 
-        _currentHeight = _enemyPack.EnemyGrid.Columns[0].Enemies[0].transform.position.y;
+        _currentHeight = _enemyPack.Enemies[0][0].Enemy.transform.position.y;
 
         _movementTarget = new Vector3(movementField.LeftBorder + _enemyPack.Width, _currentHeight, 0);
         StartMovingTo(_movementTarget);
@@ -95,17 +95,19 @@ public class EnemyCoordination : MonoBehaviour
 
     private void StartMovingTo(Vector3 position)
     {
-        for (int i = 0; i < _enemyPack.EnemyGrid.Columns.Length; i++)
+        for (int i = 0; i < _enemyPack.Enemies.Count; i++)
         {
-            for (int j = 0; j < _enemyPack.EnemyGrid.Columns[i].Enemies.Length; j++)
+            for (int j = 0; j < _enemyPack.Enemies[i].Count; j++)
             {
-                if (_enemyPack.EnemyGrid.Columns[i].Enemies[j] != null)
+                EnemyPack.EnemyPlace enemyPlace = _enemyPack.Enemies[i][j];
+
+                if (enemyPlace != null)
                 {
                     Vector3 movementTarget = position;
-                    movementTarget.x -= i * _enemyPack.HorizontalDistance;
-                    movementTarget.y -= j * _enemyPack.VerticalDistance;
+                    movementTarget.x += enemyPlace.RelativePosition.x;
+                    movementTarget.y += enemyPlace.RelativePosition.y;
 
-                    _enemyPack.EnemyGrid.Columns[i].Enemies[j].Movement.SetMovementTarget(movementTarget);
+                    enemyPlace.Enemy.Movement.SetMovementTarget(movementTarget);
                 }
             }
         }
@@ -115,13 +117,13 @@ public class EnemyCoordination : MonoBehaviour
     {
         bool allHaveReached = true;
 
-        foreach (var column in _enemyPack.EnemyGrid.Columns)
+        foreach (var column in _enemyPack.Enemies)
         {
-            foreach (var enemy in column.Enemies)
+            foreach (var enemy in column)
             {
                 if (enemy != null)
                 {
-                    allHaveReached &= enemy.Movement.CheckIfHasReachedTarget();
+                    allHaveReached &= enemy.Enemy.Movement.CheckIfHasReachedTarget();
                 }
             }
         }
@@ -154,7 +156,10 @@ public class EnemyCoordination : MonoBehaviour
 
             foreach (var salvoMember in salvoMembers)
             {
-                shooter.Shoot(salvoMember.Muzzle);
+                if (salvoMember != null)
+                {
+                    shooter.Shoot(salvoMember.Muzzle);
+                }
             }
         }
     }

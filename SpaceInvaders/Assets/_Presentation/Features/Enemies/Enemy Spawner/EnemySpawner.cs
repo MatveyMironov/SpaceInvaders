@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -8,28 +9,33 @@ public class EnemySpawner : MonoBehaviour
     [ContextMenu("Spawn Enemies")]
     public EnemyPack SpawnEnemies()
     {
-        EnemyGrid.Column[] columns = new EnemyGrid.Column[spawnerProgram.EnemyGrid.Columns.Length];
+        List<List<EnemyPack.EnemyPlace>> enemies = new();
 
         for (int i = 0; i < spawnerProgram.EnemyGrid.Columns.Length; i++)
         {
-            Enemy[] enemies = new Enemy[spawnerProgram.EnemyGrid.Columns[i].Enemies.Length];
+            List<EnemyPack.EnemyPlace> column = new();
 
             for (int j = 0; j < spawnerProgram.EnemyGrid.Columns[i].Enemies.Length; j++)
             {
                 Enemy enemyPrefab = spawnerProgram.EnemyGrid.Columns[i].Enemies[j];
 
+                Vector3 relativePosition = Vector3.zero;
+                relativePosition.x = -(float)i * spawnerProgram.HorizontalDistance;
+                relativePosition.y = -(float)j * spawnerProgram.VerticalDistance;
+
                 Vector3 spawnPoint = new Vector3();
-                spawnPoint.x = spawnOrigin.position.x - (float)i * spawnerProgram.HorizontalDistance;
-                spawnPoint.y = spawnOrigin.position.y - (float)j * spawnerProgram.VerticalDistance;
-                
+                spawnPoint.x = spawnOrigin.position.x + relativePosition.x;
+                spawnPoint.y = spawnOrigin.position.y + relativePosition.y;
+
                 Enemy enemy = Instantiate(enemyPrefab, spawnPoint, Quaternion.identity);
-                enemies[j] = enemy;
+                EnemyPack.EnemyPlace enemyPlace = new(enemy, relativePosition);
+                column.Add(enemyPlace);
             }
 
-            columns[i] = new EnemyGrid.Column(enemies);
+            enemies.Add(column);
         }
 
-        return new EnemyPack(new EnemyGrid(columns), spawnerProgram.HorizontalDistance, spawnerProgram.VerticalDistance);
+        return new EnemyPack(enemies, spawnerProgram.HorizontalDistance, spawnerProgram.VerticalDistance);
     }
 
     private void OnDrawGizmos()
