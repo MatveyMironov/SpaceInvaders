@@ -32,22 +32,10 @@ public class EnemyCoordination : MonoBehaviour
         right,
     }
 
-    private void Start()
-    {
-        _enemyPack = spawner.SpawnEnemies();
-
-        _currentHeight = _enemyPack.Enemies[0][0].Enemy.transform.position.y;
-
-        _movementTarget = new Vector3(movementField.LeftBorder + _enemyPack.Width, _currentHeight, 0);
-        StartMovingTo(_movementTarget);
-        _previousDirection = MovementDirection.left;
-        _currentDirection = MovementDirection.left;
-
-        StartCoroutine(ShootingCouroutine());
-    }
-
     private void Update()
     {
+        if (_enemyPack == null) { return; }
+
         if (CheckIfAllReachedPosition())
         {
             if (CheckIfAnyReachedLowerBorder())
@@ -84,6 +72,35 @@ public class EnemyCoordination : MonoBehaviour
 
             StartMovingTo(_movementTarget);
         }
+    }
+
+    public void StartEnemies()
+    {
+        _enemyPack = spawner.SpawnEnemies();
+
+        _currentHeight = _enemyPack.Enemies[0][0].Enemy.transform.position.y;
+
+        _movementTarget = new Vector3(movementField.LeftBorder + _enemyPack.Width, _currentHeight, 0);
+        StartMovingTo(_movementTarget);
+        _previousDirection = MovementDirection.left;
+        _currentDirection = MovementDirection.left;
+
+        StartCoroutine(ShootingCouroutine());
+    }
+
+    public void DestroyAllEnemies()
+    {
+        if (_enemyPack == null) { return; }
+
+        foreach (var column in _enemyPack.Enemies)
+        {
+            foreach (var enemy in column)
+            {
+                Destroy(enemy.Enemy.gameObject);
+            }
+        }
+
+        _enemyPack = null;
     }
 
     private void ChangeMovementDirection(MovementDirection direction)
