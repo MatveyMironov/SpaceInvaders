@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class EnemyCoordination : MonoBehaviour
@@ -12,6 +13,8 @@ public class EnemyCoordination : MonoBehaviour
     [SerializeField] private EnemyShooter shooter;
     [SerializeField] private float salvoCooldown;
     [SerializeField, Range(1, 10)] private int maxSalvoMembers;
+
+    private float _salvoTimer = 0f;
 
     private EnemyPack _enemyPack;
 
@@ -72,6 +75,18 @@ public class EnemyCoordination : MonoBehaviour
 
             StartMovingTo(_movementTarget);
         }
+
+        if (CheckIfAllDestoryed())
+        {
+            OnAllEnemiesDestroyed?.Invoke();
+        }
+
+        _salvoTimer += Time.deltaTime;
+        if (_salvoTimer >= salvoCooldown)
+        {
+            Shoot();
+            _salvoTimer = 0;
+        }
     }
 
     public void StartEnemies()
@@ -84,8 +99,6 @@ public class EnemyCoordination : MonoBehaviour
         StartMovingTo(_movementTarget);
         _previousDirection = MovementDirection.left;
         _currentDirection = MovementDirection.left;
-
-        StartCoroutine(ShootingCouroutine());
     }
 
     public void DestroyAllEnemies()
@@ -148,35 +161,43 @@ public class EnemyCoordination : MonoBehaviour
         return allHaveReached;
     }
 
+    private bool CheckIfAllDestoryed()
+    {
+        foreach (var column in _enemyPack.Enemies)
+        {
+            if (column.Count > 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private bool CheckIfAnyReachedLowerBorder()
     {
         return _enemyPack.GetLowestHeight() <= movementField.LowerBorder;
     }
 
-    private IEnumerator ShootingCouroutine()
+    private void Shoot()
     {
-        while (true)
+        List<Enemy> salvoCandidates = _enemyPack.GetAllLowest();
+        List<Enemy> salvoMembers = new();
+
+        for (int i = 0; i < maxSalvoMembers; i++)
         {
-            yield return new WaitForSeconds(salvoCooldown);
+            if (salvoCandidates.Count <= 0) { break; }
 
-            List<Enemy> salvoCandidates = _enemyPack.GetAllLowest();
-            List<Enemy> salvoMembers = new();
+            int index = UnityEngine.Random.Range(0, salvoCandidates.Count - 1);
+            salvoMembers.Add(salvoCandidates[index]);
+            salvoCandidates.RemoveAt(index);
+        }
 
-            for (int i = 0; i < maxSalvoMembers; i++)
+        foreach (var salvoMember in salvoMembers)
+        {
+            if (salvoMember != null)
             {
-                if (salvoCandidates.Count <= 0) { break; }
-
-                int index = UnityEngine.Random.Range(0, salvoCandidates.Count - 1);
-                salvoMembers.Add(salvoCandidates[index]);
-                salvoCandidates.RemoveAt(index);
-            }
-
-            foreach (var salvoMember in salvoMembers)
-            {
-                if (salvoMember != null)
-                {
-                    shooter.Shoot(salvoMember.Muzzle);
-                }
+                shooter.Shoot(salvoMember.Muzzle);
             }
         }
     }
